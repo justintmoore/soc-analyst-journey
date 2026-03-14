@@ -1,4 +1,16 @@
-# Creates users
+AD Bulk User Creation
+---
+Requirements: 
+- Active Directory Domain Services
+- PowerShell(5.1 or later) Running as Admin
+- Existing _EMPLOYEES OU (Can be changed)
+
+Notes:
+- Password is intentionally weak for lab purposes.
+- Built using ClaudeAI, and prompt building.
+
+Usage: 
+- Right-click > Run with PowerShell, or: .\CreateADUsers.ps1
 
 
 # ----- Edit these Variables for your own Use Case ----- #
