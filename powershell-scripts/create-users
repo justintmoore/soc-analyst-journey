@@ -1,7 +1,3 @@
-# Creates 1000 users with ADUC OU _EMPLOYEES. Creates both males and female names, and prevents duplicates.
-
-
-
 # ----- Edit these Variables for your own Use Case ----- #
 $PASSWORD_FOR_USERS           = "Password1"
 $NUMBER_OF_ACCOUNTS_TO_CREATE = 1000
