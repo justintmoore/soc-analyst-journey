@@ -1,0 +1,100 @@
+# Creates 1000 users with ADUC OU _EMPLOYEES. Creates both males and female names, and prevents duplicates.
+
+
+
+# ----- Edit these Variables for your own Use Case ----- #
+$PASSWORD_FOR_USERS           = "Password1"
+$NUMBER_OF_ACCOUNTS_TO_CREATE = 1000
+# ------------------------------------------------------ #
+
+$firstNames = @(
+    # Male names
+    "James","John","Robert","Michael","William","David","Richard","Joseph",
+    "Thomas","Charles","Christopher","Daniel","Matthew","Anthony","Mark",
+    "Donald","Steven","Paul","Andrew","Joshua","Kenneth","Kevin","Brian",
+    "George","Timothy","Ronald","Edward","Jason","Jeffrey","Ryan","Jacob",
+    "Gary","Nicholas","Eric","Jonathan","Stephen","Larry","Justin","Scott",
+    "Brandon","Benjamin","Samuel","Raymond","Gregory","Frank","Alexander",
+    "Patrick","Jack","Dennis","Jerry","Tyler","Aaron","Jose","Adam","Henry",
+    "Nathan","Douglas","Zachary","Peter","Kyle","Walter","Ethan","Jeremy",
+    "Harold","Carl","Dylan","Arthur","Lawrence","Jordan","Jesse","Bryan",
+    "Billy","Bruce","Gabriel","Joe","Logan","Alan","Juan","Albert","Willie",
+    "Wayne","Elijah","Randy","Roy","Vincent","Ralph","Eugene","Russell",
+    "Bobby","Mason","Philip","Louis","Johnny","Bradley",
+
+    # Female names
+    "Mary","Patricia","Jennifer","Linda","Barbara","Elizabeth","Susan","Jessica",
+    "Sarah","Karen","Lisa","Nancy","Betty","Margaret","Sandra","Ashley",
+    "Emily","Kimberly","Donna","Carol","Michelle","Dorothy","Amanda","Melissa",
+    "Deborah","Stephanie","Rebecca","Sharon","Laura","Cynthia","Kathleen",
+    "Amy","Angela","Shirley","Anna","Brenda","Pamela","Emma","Nicole",
+    "Helen","Samantha","Katherine","Christine","Debra","Rachel","Carolyn",
+    "Janet","Catherine","Maria","Heather","Diane","Julie","Joyce","Victoria",
+    "Ruth","Virginia","Lauren","Kelly","Christina","Joan","Evelyn","Judith",
+    "Olivia","Megan","Andrea","Cheryl","Hannah","Martha","Jacqueline","Frances",
+    "Gloria","Ann","Teresa","Kathryn","Sara","Janice","Jean","Alice","Madison",
+    "Doris","Abigail","Julia","Grace","Amber","Isabella","Natalie","Danielle",
+    "Marilyn","Diana","Brittany","Theresa","Sophia","Kayla","Alexis","Tiffany"
+)
+
+$lastNames = @(
+    "Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis",
+    "Rodriguez","Martinez","Hernandez","Lopez","Gonzalez","Wilson","Anderson",
+    "Thomas","Taylor","Moore","Jackson","Martin","Lee","Perez","Thompson",
+    "White","Harris","Sanchez","Clark","Ramirez","Lewis","Robinson","Walker",
+    "Young","Allen","King","Wright","Scott","Torres","Nguyen","Hill","Flores",
+    "Green","Adams","Nelson","Baker","Hall","Rivera","Campbell","Mitchell",
+    "Carter","Roberts","Turner","Phillips","Evans","Collins","Edwards","Stewart",
+    "Morris","Murphy","Cook","Rogers","Morgan","Peterson","Cooper","Reed",
+    "Bailey","Bell","Gomez","Kelly","Howard","Ward","Cox","Diaz","Richardson",
+    "Wood","Watson","Brooks","Bennett","Gray","James","Reyes","Cruz","Hughes",
+    "Price","Myers","Long","Foster","Sanders","Ross","Morales","Powell","Sullivan",
+    "Russell","Ortiz","Jenkins","Gutierrez","Perry","Butler","Barnes","Fisher",
+    "Henderson","Coleman","Simmons","Patterson","Jordan","Reynolds","Hamilton",
+    "Graham","Kim","Gonzales","Alexander","Ramos","Wallace","Griffin","West",
+    "Cole","Hayes","Chavez","Gibson","Bryant","Ellis","Stevens","Murray","Ford",
+    "Marshall","Owens","McDonald","Harrison","Ruiz","Kennedy","Wells","Alvarez",
+    "Woods","Mendoza","Castillo","Olson","Webb","Washington","Tucker","Freeman",
+    "Burns","Henry","Vasquez","Snyder","Simpson","Crawford","Jimenez","Porter",
+    "Mason","Shaw","Gordon","Wagner","Hunter","Romero","Hicks","Dixon","Hunt",
+    "Palmer","Robertson","Black","Holmes","Stone","Meyer","Boyd","Mills","Warren",
+    "Fox","Rose","Rice","Moreno","Schmidt","Patel","Ferguson","Nichols","Herrera",
+    "Medina","Ryan","Cunningham","Reeves","Harper","Frazier","Burke","Hanson",
+    "Day","Mendez","Erickson","Carr","Garza","Holland","Duncan","Larson","Reid"
+)
+
+# Pre-generate every unique combination, shuffle, then take what we need
+$allCombinations = foreach ($first in $firstNames) {
+    foreach ($last in $lastNames) {
+        "$first.$last".ToLower()
+    }
+}
+
+$shuffled = $allCombinations | Sort-Object { Get-Random }
+
+if ($NUMBER_OF_ACCOUNTS_TO_CREATE -gt $shuffled.Count) {
+    Write-Warning "Requested $NUMBER_OF_ACCOUNTS_TO_CREATE accounts but only $($shuffled.Count) unique name combinations exist. Creating $($shuffled.Count) accounts instead."
+    $NUMBER_OF_ACCOUNTS_TO_CREATE = $shuffled.Count
+}
+
+$selectedUsers = $shuffled | Select-Object -First $NUMBER_OF_ACCOUNTS_TO_CREATE
+
+foreach ($username in $selectedUsers) {
+    $parts     = $username -split '\.'
+    $firstName = (Get-Culture).TextInfo.ToTitleCase($parts[0])
+    $lastName  = (Get-Culture).TextInfo.ToTitleCase($parts[1])
+    $password  = ConvertTo-SecureString $PASSWORD_FOR_USERS -AsPlainText -Force
+
+    Write-Host "Creating user: $username" -BackgroundColor Black -ForegroundColor Cyan
+
+    New-ADUser -AccountPassword $password `
+               -GivenName $firstName `
+               -Surname $lastName `
+               -DisplayName "$firstName $lastName" `
+               -Name $username `
+               -SamAccountName $username `
+               -EmployeeID $username `
+               -PasswordNeverExpires $true `
+               -Path "ou=_EMPLOYEES,$(([ADSI]`"").distinguishedName)" `
+               -Enabled $true
+}
