@@ -8,7 +8,7 @@ All scripts are sanitized. No real company names, usernames, IPs, hostnames, or 
 
 ## Scripts
 
-### `CreateADUsers.ps1`
+### [`CreateADUsers.ps1`](./CreateADUsers.ps1)
 Bulk-creates Active Directory user accounts in the `_EMPLOYEES` OU using randomized first/last name combinations. Built for lab environments to simulate enterprise user provisioning and generate Event ID 4720 (account creation) events for SIEM testing and alert tuning.
 
 - **Requirements:** AD DS, PowerShell 5.1+, Domain Admin, existing `_EMPLOYEES` OU
