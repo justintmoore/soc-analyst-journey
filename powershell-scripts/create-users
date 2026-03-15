@@ -7,7 +7,8 @@ Requirements:
 
 Notes:
 - Password is intentionally weak for lab purposes.
-- Built using ClaudeAI, and prompt building.
+- Built using ClaudeAI and prompt building.
+- MITRE ATT&CK: T1136.001 — Create Account: Local Account
 
 Usage: 
 - Right-click > Run with PowerShell, or: .\CreateADUsers.ps1
