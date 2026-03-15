@@ -2,7 +2,7 @@
 
 PowerShell scripts built during hands-on lab work and daily practice. Each script includes a header with purpose, requirements, and MITRE ATT&CK mapping where applicable.
 
-All scripts are sanitized — no real company names, usernames, IPs, hostnames, or emails.
+All scripts are sanitized. No real company names, usernames, IPs, hostnames, or emails.
 
 ---
 
